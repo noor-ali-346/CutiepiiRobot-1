@@ -353,7 +353,8 @@ def about_me(update: Update, context: CallbackContext):
     if info:
         update.effective_message.reply_text(
             f"*{user.first_name}*:\n{escape_markdown(info)}",
-            parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+            parse_mode=ParseMode.MARKDOWN,
+            disable_web_page_preview=True)
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
         update.effective_message.reply_text(
@@ -419,7 +420,8 @@ def about_bio(update: Update, context: CallbackContext):
     if info:
         update.effective_message.reply_text(
             "*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-            parse_mode=ParseMode.MARKDOWN,disable_web_page_preview=True)
+            parse_mode=ParseMode.MARKDOWN,
+            disable_web_page_preview=True)
     elif message.reply_to_message:
         username = user.first_name
         update.effective_message.reply_text(
