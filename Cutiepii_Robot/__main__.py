@@ -7,6 +7,7 @@ import sys
 import traceback
 import Cutiepii_Robot.modules.sql.users_sql as sql
 
+
 from sys import argv
 from typing import Optional
 from Cutiepii_Robot import (
@@ -81,15 +82,16 @@ def get_readable_time(seconds: int) -> str:
     return ping_time
 
 
-CUTIEPII_IMG = "https://telegra.ph/file/57d1e105345723fea0edd.png"
+CUTIEPII_IMG = "https://telegra.ph/file/d8b55d150c6fbf11aa8b3.png"
     
 PM_START_TEXT = """
-────「 [NOHA](https://telegra.ph/file/d8b55d150c6fbf11aa8b3.png) 」────
-*Hola! {},* Thnx to @Cutiepii_Robot for source 😀
+────「 [noha X](https://telegra.ph/file/d8b55d150c6fbf11aa8b3.png) 」────
+*Hola! {},*
 *I am an Anime themed advance group management bot with a lot of Sexy Features.*
 ➖➖➖➖➖➖➖➖➖➖➖➖➖
 • *Uptime:* `{}`
 • `{}` *users, across* `{}` *chats.*
+• *thnx to @awesome_shane for cutiepii robot repo*
 ➖➖➖➖➖➖➖➖➖➖➖➖➖
 ➛ Try The Help Buttons Below To Know My Abilities ××
 """
@@ -102,8 +104,8 @@ Haven't slept since: {}
 buttons = [
     [
                         InlineKeyboardButton(
-                            text="Add noha To Your Group",
-                            url="t.me/nohaxbot?startgroup=true")
+                            text="Add me To Your Group",
+                            url="t.me/NohaXbot?startgroup=true")
                     ],
                    [
                        InlineKeyboardButton(text="[► Help ◄]", callback_data="help_back"),
@@ -112,11 +114,11 @@ buttons = [
                      ],
                     [                  
                        InlineKeyboardButton(
-                             text="❔ Chit Chat",
-                             url="https://t.me/HindiKDrama"),
+                             text="❔ Chat Do for bot?",
+                             url="https://t.me/noha_support"),
                        InlineKeyboardButton(
                              text="📢 Updates",
-                             url="https://t.me/Noha_support")
+                             url="https://t.me/noha_updates")
                      ], 
     ]
 
@@ -484,25 +486,24 @@ def send_settings(chat_id, user_id, user=False):
                 parse_mode=ParseMode.MARKDOWN,
             )
 
+    elif CHAT_SETTINGS:
+        chat_name = dispatcher.bot.getChat(chat_id).title
+        dispatcher.bot.send_message(
+            user_id,
+            text="Which module would you like to check {}'s settings for?".format(
+                chat_name
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                paginate_modules(0, CHAT_SETTINGS, "stngs", chat=chat_id)
+            ),
+        )
     else:
-        if CHAT_SETTINGS:
-            chat_name = dispatcher.bot.getChat(chat_id).title
-            dispatcher.bot.send_message(
-                user_id,
-                text="Which module would you like to check {}'s settings for?".format(
-                    chat_name
-                ),
-                reply_markup=InlineKeyboardMarkup(
-                    paginate_modules(0, CHAT_SETTINGS, "stngs", chat=chat_id)
-                ),
-            )
-        else:
-            dispatcher.bot.send_message(
-                user_id,
-                "Seems like there aren't any chat settings available :'(\nSend this "
-                "in a group chat you're admin in to find its current settings!",
-                parse_mode=ParseMode.MARKDOWN,
-            )
+        dispatcher.bot.send_message(
+            user_id,
+            "Seems like there aren't any chat settings available :'(\nSend this "
+            "in a group chat you're admin in to find its current settings!",
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
 
 def settings_button(update: Update, context: CallbackContext):
@@ -594,29 +595,28 @@ def get_settings(update: Update, context: CallbackContext):
     msg = update.effective_message  # type: Optional[Message]
 
     # ONLY send settings in PM
-    if chat.type != chat.PRIVATE:
-        if is_user_admin(chat, user.id):
-            text = "Click here to get this chat's settings, as well as yours."
-            msg.reply_text(
-                text,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                text="Settings",
-                                url="t.me/{}?start=stngs_{}".format(
-                                    context.bot.username, chat.id
-                                ),
-                            )
-                        ]
-                    ]
-                ),
-            )
-        else:
-            text = "Click here to check your settings."
-
-    else:
+    if chat.type == chat.PRIVATE:
         send_settings(chat.id, user.id, True)
+
+    elif is_user_admin(chat, user.id):
+        text = "Click here to get this chat's settings, as well as yours."
+        msg.reply_text(
+            text,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="Settings",
+                            url="t.me/{}?start=stngs_{}".format(
+                                context.bot.username, chat.id
+                            ),
+                        )
+                    ]
+                ]
+            ),
+        )
+    else:
+        text = "Click here to check your settings."
 
 
 def donate(update: Update, context: CallbackContext):
@@ -678,11 +678,11 @@ def main():
     help_handler = DisableAbleCommandHandler("help", get_help, run_async=True)
     help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_.*", run_async=True)
 
-    settings_handler = CommandHandler("settings", get_settings)
+    settings_handler = DisableAbleCommandHandler("settings", get_settings)
     settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_", run_async=True)
 
     data_callback_handler = CallbackQueryHandler(cutiepii_callback_data, pattern=r"cutiepii_", run_async=True)
-    donate_handler = CommandHandler("donate", donate, run_async=True)
+    donate_handler = DisableAbleCommandHandler("donate", donate, run_async=True)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats, run_async=True)
 
     # dispatcher.add_handler(test_handler)
